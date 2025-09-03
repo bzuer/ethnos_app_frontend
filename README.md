@@ -1,5 +1,7 @@
 # Ethnos_APP Frontend Interface v2.0.0
 
+[![DOI](https://zenodo.org/badge/1050037172.svg)](https://doi.org/10.5281/zenodo.17050053)
+
 **Release Date**: September 2025  
 **Status**: Production Ready  
 **License**: MIT - Academic Research Platform
@@ -234,8 +236,8 @@ https://doi.org/{}
   title = {Ethnos_APP Frontend Interface},
   version = {2.0.0},
   year = {2025},
-  doi = {},
-  url = {https://ethnos.app}
+  doi = {https://doi.org/10.5281/zenodo.17050053},
+  url = {https://ethnos.app[}](https://doi.org/10.5281/zenodo.17050053)
 }
 ```
 
@@ -243,5 +245,5 @@ https://doi.org/{}
 
 **Contact**: Technical documentation and integration support available through the Ethnos.app platform  
 **Repository**: Production deployment with comprehensive monitoring and logging  
-**DOI**: https://doi.or{}
+**DOI**: https://doi.or{https://doi.org/10.5281/zenodo.17050053}
 **Status**: Enterprise-ready academic research infrastructure
