@@ -245,5 +245,5 @@ https://doi.org/{}
 
 **Contact**: Technical documentation and integration support available through the Ethnos.app platform  
 **Repository**: Production deployment with comprehensive monitoring and logging  
-**DOI**: https://doi.or{https://doi.org/10.5281/zenodo.17050053}
+**DOI**: https://doi.or{https://doi.org/10.5281/zenodo.17050053}  
 **Status**: Enterprise-ready academic research infrastructure
