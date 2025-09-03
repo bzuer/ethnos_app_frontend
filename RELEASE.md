@@ -1,6 +1,6 @@
 # Ethnos_APP - Frontend Interface v2.0.0
 
-{DOI}
+[![DOI](https://zenodo.org/badge/1050037172.svg)](https://doi.org/10.5281/zenodo.17050053)
 
 Flask-based web application providing server-side rendering for the Ethnos.app Academic Bibliography API
 
@@ -210,5 +210,5 @@ The Ethnos.app Frontend Interface serves as the primary user interface for the E
 **Contact**: Technical documentation and integration support available through the Ethnos.app platform  
 **Repository**: Production deployment with comprehensive monitoring and logging 
 **API Integration**: Ethnos.app Academic Bibliography API v2.0.0        
-**DOI**: https://doi.org/{} 
+**DOI**: https://doi.org/10.5281/zenodo.17050053  
 **Status**: Enterprise-ready academic research infrastructure
