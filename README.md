@@ -231,13 +231,13 @@ https://doi.org/{}
 
 **BibTeX:**
 ```bibtex
-@software{ethnos_api_2025,
+@software{ethnos_app_2025,
   author = {Cruz, Bruno Cesar Cunha},
   title = {Ethnos_APP Frontend Interface},
   version = {2.0.0},
   year = {2025},
   doi = {https://doi.org/10.5281/zenodo.17050053},
-  url = {https://ethnos.app[}](https://doi.org/10.5281/zenodo.17050053)
+  url = {https://ethnos.app(https://ethnos.app)}
 }
 ```
 
