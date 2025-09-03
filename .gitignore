@@ -69,12 +69,6 @@ Thumbs.db
 *.tmp
 *.temp
 
-# Documentation and project files
-/scripts/
-!README.md
-!CLAUDE.md.example
-!/docs/
-
 # Arquivos temporários e logs locais
 *.pid
 *.sock
