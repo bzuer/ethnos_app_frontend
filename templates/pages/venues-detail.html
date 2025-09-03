@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}{% if venue %}{{ venue.name }} - {% endif %}Detalhes do Periódico - ethnos_app{% endblock %}
+
+{% block content %}
+<div class="page-header" aria-labelledby="page-title">
+  <h1 class="page-title" id="page-title">
+    {% if venue %}{{ venue.name }}{% else %}Periódico não encontrado{% endif %}
+  </h1>
+</div>
+
+{% if venue %}
+<section aria-labelledby="venue-info">
+    <h2 class="title-section" id="venue-info">Dados do Periódico</h2>
+    <table class="data-table item-detail-table" id="venue-details">
+      <tbody>
+        {% if venue.type %}
+        <tr>
+          <th scope="row">TIPO</th>
+          <td class="field-value">{{ venue.type }}</td>
+        </tr>
+        {% endif %}
+        
+        {% if venue.publisher_name %}
+        <tr>
+          <th scope="row">EDITORA</th>
+          <td class="field-value">{{ venue.publisher_name }}</td>
+        </tr>
+        {% endif %}
+        
+        {% if venue.publisher_country %}
+        <tr>
+          <th scope="row">PAÍS DA EDITORA</th>
+          <td class="field-value">{{ venue.publisher_country }}</td>
+        </tr>
+        {% endif %}
+        
+        {% if venue.issn %}
+        <tr>
+          <th scope="row">ISSN</th>
+          <td class="field-value">{{ venue.issn }}</td>
+        </tr>
+        {% endif %}
+        
+        {% if venue.eissn and venue.eissn != venue.issn %}
+        <tr>
+          <th scope="row">ISSN ELETRÔNICO</th>
+          <td class="field-value">{{ venue.eissn }}</td>
+        </tr>
+        {% endif %}
+        
+        <tr>
+          <th scope="row">TOTAL DE PUBLICAÇÕES</th>
+          <td class="field-value">{{ '{:,}'.format(venue.works_count or 0).replace(',', '.') }}</td>
+        </tr>
+        
+        {% if venue.first_publication_year and venue.last_publication_year %}
+        <tr>
+          <th scope="row">PERÍODO DE PUBLICAÇÃO</th>
+          <td class="field-value">{{ venue.first_publication_year }} - {{ venue.last_publication_year }}</td>
+        </tr>
+        {% endif %}
+        
+        {% if venue.avg_publication_year %}
+        <tr>
+          <th scope="row">ANO MÉDIO DE PUBLICAÇÃO</th>
+          <td class="field-value">{{ venue.avg_publication_year|round|int }}</td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </section>
+{% endif %}
+
+  <section aria-labelledby="venue-publications-title">
+    <h2 class="title-section" id="venue-publications-title">Publicações neste Periódico</h2>
+    <div class="results-container" id="venue-publications">
+      {% if publications %}
+        {% for pub in publications %}
+        {% if pub.authors and pub.authors|length > 0 %}
+        <article class="result-item">
+          <h3 class="result-title">
+            <a href="{{ url_for('works_detail', work_id=pub.id) }}" class="result-link">
+              {% set title_text = pub.title %}
+              {% if pub.subtitle %}
+                {% set title_text = title_text + " - " + pub.subtitle %}
+              {% endif %}
+              {% if title_text|length > 200 %}
+                {{ title_text[:200] }}...
+              {% else %}
+                {{ title_text }}
+              {% endif %}
+            </a>
+          </h3>
+          
+          <div class="result-meta">
+            <span class="result-authors">
+              {% if pub.authors %}
+                {% for author in pub.authors[:2] %}
+                  {% if author.person_id %}
+                    <a class="action-link" href="/person/{{ author.person_id }}/works" aria-label="Ver obras de {{ author.name }}">
+                      {{ author.name }}
+                    </a>
+                  {% else %}
+                    <span>{{ author.name }}</span>
+                  {% endif %}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+                {% if pub.authors|length > 2 %} et al.{% endif %}
+              {% else %}
+                Autor não informado
+              {% endif %}
+            </span>
+            {% if pub.year %}
+            <span class="result-year"> • {{ pub.year }}</span>
+            {% endif %}
+            {% if pub.work_type %}
+            <span class="result-type"> • {{ pub.work_type|title }}</span>
+            {% endif %}
+            {% if pub.language %}
+            <span class="result-language"> • {{ pub.language }}</span>
+            {% endif %}
+          </div>
+          
+        </article>
+        {% endif %}
+        {% endfor %}
+        
+        {% if total_pages > 1 %}
+        <nav class="pagination-nav" aria-label="Navegação de páginas de publicações">
+          {% if has_prev %}
+          <a href="{{ url_for('venues_detail', venue_id=venue_id, page=page-1) }}" class="action-btn btn-negative" aria-label="Página anterior">← Anterior</a>
+          {% else %}
+          <button class="action-btn pagination-btn disabled" disabled aria-label="Página anterior">← Anterior</button>
+          {% endif %}
+          
+          <span class="pagination-info">Página {{ page }} de {{ total_pages }}</span>
+          
+          {% if has_next %}
+          <a href="{{ url_for('venues_detail', venue_id=venue_id, page=page+1) }}" class="action-btn btn-positive" aria-label="Próxima página">Próxima →</a>
+          {% else %}
+          <button class="action-btn pagination-btn disabled" disabled aria-label="Próxima página">Próxima →</button>
+          {% endif %}
+        </nav>
+        {% endif %}
+      {% else %}
+        <div class="no-results">
+          <p>Nenhuma publicação encontrada para este periódico.</p>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+
+{% if venue %}
+<div id="venue-data" 
+     data-venue-id="{{ venue_id }}" 
+     data-publications-loaded="{{ publications|length }}" 
+     data-total-publications="{{ total_publications }}"
+     class="hidden"></div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/journal-detail.min.js') }}"></script>
+{% endblock %}

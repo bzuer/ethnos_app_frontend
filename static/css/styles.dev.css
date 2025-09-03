@@ -1,0 +1,1183 @@
+/*
+ * ANTROPOTECA - FOLHA DE ESTILOS MESTRA
+ * Versão: 1.0
+ * Filosofia: "Brutalismo Elegante: Funcionalidade com Respiração"
+ * Descrição: Este arquivo contém todas as regras de estilo para o projeto,
+ * servindo como a única fonte de verdade para o design visual.
+*/
+
+/* ==========================================================================
+   1.0 VARIÁVEIS GLOBAIS (O SISTEMA DE DESIGN)
+   ========================================================================== */
+/*
+ * Localização: Aplicado ao :root para disponibilidade global.
+ * Uso: Define todas as cores, fontes, espaçamentos e dimensões
+ * para garantir consistência em todo o projeto.
+*/
+:root {
+  /* -- 1.1 Cores -- */
+  --document-white: #F8F8F7; /* Fundo de componentes como inputs e tabelas. */
+  --bg-light: #F5F5F4;       /* Fundo de seções agrupadas (fieldsets) e hover de tabelas. */
+  --border-gray: #CCCCCA;    /* Bordas estruturais de tabelas, contentores e inputs. */
+  --text-black: #0D0D0D;     /* Títulos principais e texto de alta importância. */
+  --label-gray: #555555;     /* Títulos de seção, <th> de tabelas, labels de formulários. */
+  --data-gray: #333333;      /* Conteúdo principal de texto e dados. */
+  --subtle-gray: #888888;    /* Metadados secundários, navegação, rodapé. */
+  --primary-red: #C41E3A;    /* Ações primárias (busca), paginação, foco de formulários. */
+  --primary-blue: #1B365D;   /* Links de ação, títulos de itens, botões de exportação. */
+
+  /* -- 1.2 Tipografia -- */
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "SF Pro Display", sans-serif;
+  --mono: "SF Mono", "Monaco", "Consolas", monospace;
+
+  /* -- 1.3 Espaçamentos -- */
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 36px;
+  --spacing-xxl: 60px;
+
+  /* -- 1.5 Acessibilidade -- */
+  --focus-color: #005FCC;       /* Cor de foco com alto contraste */
+  --skip-link-bg: #000000;     /* Fundo do skip link */
+
+  /* -- 1.4 Layout -- */
+  --container-max: 800px;         /* Largura padrão para páginas de texto. */
+  --container-large: 960px;       /* Largura para páginas com visualizações. */
+  --grid-unit: 36px;              /* Largura da célula do grid de fundo. */
+  --grid-height: 24px;            /* Altura da célula do grid de fundo. */
+  --border-thin: 1px;
+}
+
+/* ==========================================================================
+   2.0 ESTILOS GLOBAIS E LAYOUT
+   ========================================================================== */
+/*
+ * Localização: Elementos base (html, body) e a classe .container.
+ * Uso: Define o reset, o layout principal da página (centralizado)
+ * e o fundo de "papel milimetrado".
+*/
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border-radius: 0; /* Princípio do Brutalismo: sem cantos arredondados. */
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--sans);
+  background-color: var(--document-white);
+  color: var(--text-black);
+  line-height: 1.4;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Alinha o conteúdo ao topo. */
+  min-height: 100vh;
+  padding: var(--spacing-xxl) 0;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: 
+    linear-gradient(90deg, rgba(204, 204, 202, 0.1) 1px, transparent 1px),
+    linear-gradient(rgba(204, 204, 202, 0.1) 1px, transparent 1px);
+  background-size: var(--grid-unit) var(--grid-height);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.container {
+  max-width: var(--container-max);
+  width: 100%;
+  padding: 0 var(--spacing-xl);
+}
+
+/* ==========================================================================
+   3.0 TIPOGRAFIA
+   ========================================================================== */
+/*
+ * Localização: Classes de título e elementos de texto.
+ * Uso: Estabelece a hierarquia visual clara do conteúdo.
+*/
+.title-primary { font-family: var(--mono); font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin-bottom: var(--spacing-sm); }
+.page-title { font-family: var(--mono); font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 0; margin-bottom: var(--spacing-md); }
+.title-section { font-family: var(--mono); font-size: 14px; font-weight: 700; text-transform: uppercase; color: var(--label-gray); margin-bottom: var(--spacing-md); padding-bottom: var(--spacing-sm); border-bottom: var(--border-thin) solid var(--border-gray); }
+.item-subtitle, .description { font-family: var(--sans); font-size: 16px; font-style: normal; color: var(--data-gray); margin-bottom: var(--spacing-md); }
+.description { font-size: 14px; }
+
+/* -- Tipografia de Dados (Monoespaçada) -- */
+.nav-breadcrumb, .field-value, .form-label, .result-meta, .pagination-info, .footer, figcaption { font-family: var(--mono); font-size: 12px; }
+.nav-breadcrumb { text-transform: uppercase; color: var(--subtle-gray); text-decoration: none; position: relative; }
+.nav-disabled { cursor: default; opacity: 0.5; }
+.field-value { color: var(--data-gray); }
+.form-label { text-transform: uppercase; color: var(--label-gray); font-weight: 700; margin-bottom: var(--spacing-sm); }
+.result-meta { text-transform: uppercase; color: var(--subtle-gray); margin: var(--spacing-sm) 0; }
+.result-meta .author { color: var(--data-gray); font-weight: 600; }
+.footer { text-transform: uppercase; color: var(--subtle-gray); }
+
+/* -- Lista Counter -- */
+.list-counter { 
+  display: inline-block;
+  background: var(--primary-red);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 4px;
+  min-width: 16px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* ==========================================================================
+   4.0 COMPONENTES PRINCIPAIS
+   ========================================================================== */
+/*
+ * Localização: Elementos estruturais reutilizados em todo o site.
+ * Uso: Garante a consistência visual da navegação, tabelas e formulários.
+*/
+
+/* -- 4.1 Cabeçalho e Rodapé -- */
+.global-header { text-align: left; padding: var(--spacing-md) 0; border-bottom: var(--border-thin) solid var(--border-gray); margin-bottom: var(--spacing-lg); }
+.main-navigation { margin-top: var(--spacing-sm); }
+.page-header { margin-bottom: var(--spacing-lg); }
+.breadcrumb-separator { margin: 0 var(--spacing-sm); }
+.footer { text-align: center; padding-top: var(--spacing-md); border-top: var(--border-thin) solid var(--border-gray); margin-top: var(--spacing-xl); }
+
+/* -- 4.2 Tabelas -- */
+.data-table { 
+  width: 100%; 
+  max-width: 100%;
+  border-collapse: collapse; 
+  border: var(--border-thin) solid var(--border-gray); 
+  background-color: var(--bg-light); 
+  margin: var(--spacing-md) 0; 
+  table-layout: auto;
+}
+.data-table th, .data-table td { 
+  padding: var(--spacing-sm) var(--spacing-md); 
+  text-align: left; 
+  border-bottom: var(--border-thin) solid var(--border-gray);
+  height: auto;
+  vertical-align: top;
+  line-height: 1.4;
+}
+.data-table th { 
+  font-family: var(--mono); 
+  font-size: 12px; 
+  font-weight: 700; 
+  text-transform: uppercase; 
+  color: var(--label-gray); 
+  border-bottom-width: 1px;
+  background-color: var(--document-white);
+}
+.data-table td { 
+  font-family: var(--mono); 
+  font-size: 12px; 
+  color: var(--data-gray);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  min-height: 36px;
+  height: auto;
+  vertical-align: top;
+  line-height: 1.4;
+}
+.data-table tr:last-child td { border-bottom: none; }
+
+/* -- 4.3 Formulários -- */
+.form-input, .form-select { 
+  width: 100%; 
+  border: var(--border-thin) solid var(--border-gray); 
+  background: var(--document-white); 
+  font-family: var(--mono); 
+  font-size: 14px; 
+  padding: var(--spacing-sm) var(--spacing-md); 
+  outline: none;
+  height: 36px;
+  line-height: 1.4;
+  box-sizing: border-box;
+  vertical-align: top;
+}
+.form-select {
+  cursor: pointer;
+}
+.search-form { 
+  display: flex; 
+  margin-bottom: var(--spacing-lg); 
+  align-items: stretch;
+}
+.search-form .form-input { 
+  border-right: none; 
+  flex: 1; 
+  height: 36px;
+}
+
+/* -- 4.4 Botões -- */
+.search-btn, .action-btn, .pagination-btn, a.action-btn { 
+  padding: var(--spacing-sm) var(--spacing-md); 
+  border: var(--border-thin) solid var(--border-gray); 
+  background-color: var(--document-white);
+  color: var(--text-black);
+  font-family: var(--mono); 
+  font-size: 12px; 
+  font-weight: 700;
+  text-transform: uppercase; 
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  height: 36px;
+  line-height: 1.4;
+  box-sizing: border-box;
+  margin-top: 3px;    
+  margin-bottom: 3px; 
+  vertical-align: top;
+  align-items: center;
+  justify-content: center;
+}
+.search-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Botões padrão - cor neutra com hovers específicos */
+.search-btn, .action-btn, .pagination-btn, a.action-btn { 
+  background-color: var(--document-white); 
+  color: var(--text-black); 
+  border-color: var(--border-gray);
+}
+
+/* Ações positivas - hover azul (buscar, adicionar, ir, exportar, etc.) */
+.search-btn, .btn-positive { background-color: var(--document-white); color: var(--text-black); }
+.search-btn:hover, .btn-positive:hover { background-color: var(--primary-blue); color: var(--document-white); border-color: var(--primary-blue); }
+
+/* Ações negativas - hover vermelho (limpar, voltar, remover, etc.) */  
+.btn-negative { background-color: var(--document-white); color: var(--text-black); border-color: var(--border-gray); }
+.btn-negative:hover { background-color: var(--primary-red); color: var(--document-white); border-color: var(--primary-red); }
+
+/* ==========================================================================
+   5.0 COMPONENTES DE PÁGINA
+   ========================================================================== */
+/*
+ * Localização: Classes específicas para páginas como Resultados, Item, etc.
+ * Uso: Estiliza os elementos únicos de cada contexto.
+*/
+.results-list { list-style: none; margin: var(--spacing-md) 0; padding: 0; }
+.result-item { 
+  padding: var(--spacing-md) 0 var(--spacing-lg) 0; 
+  border-bottom: var(--border-thin) solid var(--border-gray); 
+  margin-bottom: var(--spacing-lg); 
+}
+.result-item:last-child { border-bottom: none; margin-bottom: 0; }
+
+/* Publications list layout - matches ethnos.app style */
+.publications-list { 
+  display: block;
+  margin: var(--spacing-md) 0; 
+  padding: 0;
+  width: 100%;
+}
+.publication-entry { 
+  display: block;
+  width: 100%;
+  margin-bottom: var(--spacing-lg);
+  line-height: 1.5;
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border-gray);
+  clear: both;
+}
+.publication-entry:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+.publication-entry i {
+  color: var(--subtle-gray);
+  font-style: italic;
+  display: block;
+  margin-top: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+}
+.publication-entry a.action-link {
+  font-weight: 600;
+  display: inline-block;
+  margin-bottom: var(--spacing-xs);
+}
+
+/* Quality indicators */
+.quality-indicator {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--primary-blue);
+  margin-left: var(--spacing-sm);
+}
+
+.badge-oa {
+  background-color: var(--primary-blue);
+  color: var(--document-white);
+  padding: 2px 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  margin-left: var(--spacing-sm);
+}
+.pagination { display: flex; justify-content: center; align-items: center; gap: var(--spacing-sm); margin-top: var(--spacing-xl); }
+.pagination-number.current { background: var(--primary-red); color: var(--document-white); border-color: var(--primary-red); }
+.pagination-btn.disabled { color: var(--border-gray); pointer-events: none; background-color: var(--bg-light); }
+.figure-plate { 
+  border: var(--border-thin) solid var(--border-gray); 
+  background-color: var(--bg-light); 
+  padding: var(--spacing-md); 
+  margin-bottom: var(--spacing-lg);
+}
+.figure-plate .form-input, .figure-plate .form-select {
+  margin-bottom: var(--spacing-sm);
+}
+.figure-plate .form-label {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+}
+.figure-plate .form-label:first-child {
+  margin-top: 0;
+}
+/* Year range inputs */
+.figure-plate .year-range {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+.figure-plate .year-range .form-input {
+  flex: 1;
+  margin-bottom: 0;
+}
+.figure-plate .year-range span {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--label-gray);
+  white-space: nowrap;
+}
+.figure-plate img { display: block; width: 100%; height: auto; background-color: var(--document-white); border: var(--border-thin) solid var(--border-gray); }
+.figure-plate figcaption { padding-top: var(--spacing-md); line-height: 1.5; }
+.figure-plate figcaption strong { color: var(--text-black); text-transform: uppercase; }
+.network-layout { display: grid; grid-template-columns: 1fr 300px; gap: var(--spacing-xl); align-items: flex-start; }
+#network-container { width: 100%; height: 600px; border: var(--border-thin) solid var(--border-gray); background-color: var(--document-white); }
+
+/* ==========================================================================
+   6.0 PÁGINA-SPECIFIC STYLES
+   ========================================================================== */
+/* Search Results Page */
+.search-summary { font-family: var(--mono); font-size: 14px; font-weight: 700; text-transform: uppercase; margin-bottom: var(--spacing-sm); }
+.search-stats { font-family: var(--mono); font-size: 12px; color: var(--subtle-gray); margin-bottom: var(--spacing-md); }
+.result-title { font-family: var(--sans); font-size: 16px; font-weight: 600; margin: 0 0 var(--spacing-sm) 0; }
+.result-link, .action-link { color: var(--primary-blue); text-decoration: none; }
+.result-link:hover, .action-link:hover { text-decoration: underline; }
+.result-venue { font-family: var(--mono); font-size: 12px; color: var(--subtle-gray); margin-bottom: var(--spacing-sm); }
+.result-abstract { font-family: var(--sans); font-size: 14px; color: var(--data-gray); line-height: 1.4; margin-bottom: var(--spacing-sm); }
+.error-message, .info-message, .no-results { text-align: center; padding: var(--spacing-xl); background-color: var(--bg-light); margin: var(--spacing-md) 0; }
+.load-more-container { text-align: center; padding: var(--spacing-md); background-color: var(--bg-light); margin-top: var(--spacing-md); }
+
+/* Journal Pages */  
+.page-subtitle { font-family: var(--mono); font-size: 14px; color: var(--subtle-gray); margin-bottom: var(--spacing-md); }
+.action-links { text-align: left; padding: var(--spacing-sm) 0 var(--spacing-lg) 0; }
+.pagination { display: flex; justify-content: center; align-items: center; gap: var(--spacing-md); margin: var(--spacing-xl) 0; }
+.pagination-link { color: var(--primary-blue); text-decoration: none; padding: var(--spacing-sm) var(--spacing-md); border: var(--border-thin) solid var(--border-gray); }
+.pagination-link:hover { background-color: var(--bg-light); text-decoration: none; }
+.pagination-info { font-family: var(--mono); color: var(--subtle-gray); font-size: 12px; }
+
+/* Network Viewer */
+.network-controls { display: flex; flex-direction: column; gap: 1rem; }
+.control-group { display: flex; flex-direction: column; gap: 0.5rem; }
+.slider { width: 100%; }
+.node-info { padding: 1rem; background-color: var(--bg-light); border-radius: 4px; }
+.controls-panel { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; padding: 1rem; background-color: #f8f9fa; border-radius: 4px; }
+.network-container { display: grid; grid-template-columns: 300px 1fr; gap: 2rem; min-height: 500px; }
+.network-legend { background-color: #f8f9fa; padding: 1rem; border-radius: 4px; }
+.legend-item { display: flex; align-items: center; margin-bottom: 0.5rem; }
+.node-sample { width: 20px; height: 20px; border-radius: 50%; margin-right: 0.5rem; }
+.node-high { background-color: #dc3545; }
+.node-medium { background-color: #ffc107; }
+.node-low { background-color: #28a745; }
+.nodes-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
+.author-node { padding: 1rem; border-radius: 4px; background-color: #fff; border: 2px solid; margin-bottom: 0.5rem; }
+.author-node.node-high { border-color: #dc3545; }
+.author-node.node-medium { border-color: #ffc107; }
+.author-node.node-low { border-color: #28a745; }
+.network-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+.stat-item { padding: 1rem; background-color: #f8f9fa; border-radius: 4px; text-align: center; }
+
+/* Detail Pages */
+.details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 1rem 0; }
+.detail-item { padding: 0.5rem; border-left: 3px solid #007bff; background-color: #f8f9fa; }
+
+/* Homepage Statistics */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0; }
+.stat-card { padding: 1.5rem; background-color: var(--bg-light); border: var(--border-thin) solid var(--border-gray); text-align: center; }
+.stat-label { font-family: var(--mono); font-size: 12px; color: var(--label-gray); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 var(--spacing-sm) 0; }
+.stat-value { font-family: var(--mono); font-size: 32px; font-weight: bold; color: var(--text-black); margin: 0; }
+
+/* ==========================================================================
+   7.0 INTERATIVIDADE E FEEDBACK
+   ========================================================================== */
+/*
+ * Localização: Pseudo-classes (:hover, :active, :focus).
+ * Uso: Fornece feedback visual claro para as ações do utilizador.
+*/
+.action-link:hover, .nav-breadcrumb:hover:not(.nav-disabled) { text-decoration: underline; }
+.data-table tr:hover { background-color: #e9e9e7; }
+.form-input:focus, .form-select:focus { border-color: var(--primary-red); }
+.search-btn:active, .action-btn:active, .pagination-btn:active, .pagination-number:active { transform: translateY(1px); }
+
+/* ==========================================================================
+   7.5 TABLE COLUMN WIDTHS
+   ========================================================================== */
+
+/* -- PPGAS Tables -- */
+.ppgas-professors-table th:nth-child(1), .ppgas-professors-table td:nth-child(1) { width: 35%; }
+.ppgas-professors-table th:nth-child(2), .ppgas-professors-table td:nth-child(2) { width: 12%; }
+.ppgas-professors-table th:nth-child(3), .ppgas-professors-table td:nth-child(3) { width: 12%; }
+.ppgas-professors-table th:nth-child(4), .ppgas-professors-table td:nth-child(4) { width: 15%; }
+.ppgas-professors-table th:nth-child(5), .ppgas-professors-table td:nth-child(5) { width: 26%; }
+
+.ppgas-courses-table th:nth-child(1), .ppgas-courses-table td:nth-child(1) { width: 50%; }
+.ppgas-courses-table th:nth-child(2), .ppgas-courses-table td:nth-child(2) { width: 10%; }
+.ppgas-courses-table th:nth-child(3), .ppgas-courses-table td:nth-child(3) { width: 28%; }
+.ppgas-courses-table th:nth-child(4), .ppgas-courses-table td:nth-child(4) { width: 12%; }
+
+.ppgas-authors-table th:nth-child(1), .ppgas-authors-table td:nth-child(1) { width: 60%; }
+.ppgas-authors-table th:nth-child(2), .ppgas-authors-table td:nth-child(2) { width: 20%; }
+.ppgas-authors-table th:nth-child(3), .ppgas-authors-table td:nth-child(3) { width: 20%; }
+
+/* -- Journals Tables -- */
+.journals-impact-table th:nth-child(1), .journals-impact-table td:nth-child(1) { width: 40%; }
+.journals-impact-table th:nth-child(2), .journals-impact-table td:nth-child(2) { width: 10%; }
+.journals-impact-table th:nth-child(3), .journals-impact-table td:nth-child(3) { width: 10%; }
+.journals-impact-table th:nth-child(4), .journals-impact-table td:nth-child(4) { width: 10%; }
+.journals-impact-table th:nth-child(5), .journals-impact-table td:nth-child(5) { width: 30%; }
+
+.journals-representation-table th:nth-child(1), .journals-representation-table td:nth-child(1) { width: 40%; }
+.journals-representation-table th:nth-child(2), .journals-representation-table td:nth-child(2) { width: 25%; }
+.journals-representation-table th:nth-child(3), .journals-representation-table td:nth-child(3) { width: 20%; }
+.journals-representation-table th:nth-child(4), .journals-representation-table td:nth-child(4) { width: 15%; }
+
+.journals-complete-table th:nth-child(1), .journals-complete-table td:nth-child(1) { width: 30%; }
+.journals-complete-table th:nth-child(2), .journals-complete-table td:nth-child(2) { width: 10%; }
+.journals-complete-table th:nth-child(3), .journals-complete-table td:nth-child(3) { width: 15%; }
+.journals-complete-table th:nth-child(4), .journals-complete-table td:nth-child(4) { width: 25%; }
+.journals-complete-table th:nth-child(5), .journals-complete-table td:nth-child(5) { width: 10%; }
+.journals-complete-table th:nth-child(6), .journals-complete-table td:nth-child(6) { width: 10%; }
+
+/* -- Homepage Tables -- */
+.recent-items-table th:nth-child(1), .recent-items-table td:nth-child(1) { width: 40%; }
+.recent-items-table th:nth-child(2), .recent-items-table td:nth-child(2) { width: 30%; }
+.recent-items-table th:nth-child(3), .recent-items-table td:nth-child(3) { width: 15%; }
+.recent-items-table th:nth-child(4), .recent-items-table td:nth-child(4) { width: 15%; }
+
+.homepage-venues-table th:nth-child(1), .homepage-venues-table td:nth-child(1) { width: 60%; }
+.homepage-venues-table th:nth-child(2), .homepage-venues-table td:nth-child(2) { width: 15%; }
+.homepage-venues-table th:nth-child(3), .homepage-venues-table td:nth-child(3) { width: 25%; }
+
+.api-endpoints-table th:nth-child(1), .api-endpoints-table td:nth-child(1) { width: 20%; }
+.api-endpoints-table th:nth-child(2), .api-endpoints-table td:nth-child(2) { width: 30%; }
+.api-endpoints-table th:nth-child(3), .api-endpoints-table td:nth-child(3) { width: 50%; }
+
+.stats-table th:nth-child(1), .stats-table td:nth-child(1) { width: 70%; }
+.stats-table th:nth-child(2), .stats-table td:nth-child(2) { width: 30%; }
+
+/* -- Course Detail Tables -- */
+.course-bibliography-table th:nth-child(1), .course-bibliography-table td:nth-child(1) { width: 50%; }
+.course-bibliography-table th:nth-child(2), .course-bibliography-table td:nth-child(2) { width: 25%; }
+.course-bibliography-table th:nth-child(3), .course-bibliography-table td:nth-child(3) { width: 15%; }
+.course-bibliography-table th:nth-child(4), .course-bibliography-table td:nth-child(4) { width: 10%; }
+
+/* -- Professor Detail Tables -- */
+.professor-courses-table th:nth-child(1), .professor-courses-table td:nth-child(1) { width: 45%; }
+.professor-courses-table th:nth-child(2), .professor-courses-table td:nth-child(2) { width: 10%; }
+.professor-courses-table th:nth-child(3), .professor-courses-table td:nth-child(3) { width: 10%; }
+.professor-courses-table th:nth-child(4), .professor-courses-table td:nth-child(4) { width: 15%; }
+.professor-courses-table th:nth-child(5), .professor-courses-table td:nth-child(5) { width: 20%; }
+
+/* -- Item Detail Tables -- */
+.item-detail-table th:nth-child(1), .item-detail-table td:nth-child(1) { width: 25%; }
+.item-detail-table th:nth-child(2), .item-detail-table td:nth-child(2) { width: 75%; }
+
+/* ==========================================================================
+   8.0 UTILITY CLASSES
+   ========================================================================== */
+/*
+ * Localização: Classes utilitárias para casos comuns.
+ * Uso: Classes auxiliares para funcionalidades específicas.
+*/
+.hidden { display: none !important; }
+/* ==========================================================================
+   13.0 ACESSIBILIDADE
+   ========================================================================== */
+
+.sr-only, .visually-hidden { 
+  position: absolute; 
+  width: 1px; 
+  height: 1px; 
+  padding: 0; 
+  margin: -1px; 
+  overflow: hidden; 
+  clip: rect(0, 0, 0, 0); 
+  white-space: nowrap; 
+  border: 0; 
+}
+
+.skip-link {
+  position: absolute;
+  top: -999px;
+  left: -999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  background-color: var(--skip-link-bg);
+  color: var(--document-white);
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-decoration: none;
+  font-weight: bold;
+  z-index: 9999;
+  border-radius: 0;
+  font-family: var(--sans);
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.skip-link:focus {
+  position: absolute;
+  top: var(--spacing-md);
+  left: 50%;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  transform: translateX(-50%);
+  outline: 2px solid var(--focus-color);
+  outline-offset: 2px;
+}
+
+[aria-current="page"] {
+  font-weight: bold;
+  color: var(--text-black) !important;
+}
+
+[aria-busy="true"] {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+/* Additional result item classes */
+.results-container { margin: var(--spacing-md) 0; }
+.result-authors { font-family: var(--mono); color: var(--data-gray); font-size: 12px; }
+.result-type { font-family: var(--mono); color: var(--subtle-gray); font-size: 12px; text-transform: uppercase; }
+.result-year { font-family: var(--mono); color: var(--label-gray); font-size: 12px; font-weight: bold; }
+.result-doi { font-family: var(--mono); color: var(--subtle-gray); font-size: 12px; margin: var(--spacing-sm) 0; }
+.meta-info { display: flex; gap: var(--spacing-sm); align-items: center; }
+.meta-separator { color: var(--border-gray); }
+
+/* Search and pagination navigation */
+.search-controls { 
+  display: flex; 
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-sm); 
+  margin: var(--spacing-lg) 0 var(--spacing-md) 0; 
+  padding: var(--spacing-sm) 0;
+  border-bottom: var(--border-thin) solid var(--border-gray);
+}
+.search-controls .form-input {
+  height: 36px;
+  flex: 1;
+}
+.search-controls .search-btn {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pagination-nav { 
+  display: flex; 
+  gap: var(--spacing-sm); 
+  align-items: center; 
+  justify-content: center; 
+  margin: var(--spacing-lg) 0; 
+}
+
+/* Tools actions */
+.tools-actions { 
+  display: flex; 
+  gap: var(--spacing-sm); 
+  margin: var(--spacing-md) 0; 
+  flex-wrap: wrap; 
+}
+
+/* Search statistics */
+.search-stats { 
+  display: flex; 
+  gap: var(--spacing-lg); 
+  margin: var(--spacing-md) 0 0 0; 
+  font-family: var(--mono); 
+  font-size: 12px; 
+}
+.stat-item { color: var(--subtle-gray); }
+
+/* ==========================================================================
+   Personal List Styles
+   ========================================================================== */
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-sm) 0;
+  border-bottom: var(--border-thin) solid var(--border-gray);
+}
+
+.list-stats {
+  margin: 0;
+}
+
+.list-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-xl) var(--spacing-md);
+  background-color: var(--bg-light);
+  border: var(--border-thin) solid var(--border-gray);
+  margin: var(--spacing-md) 0 var(--spacing-md) 0; 
+}
+
+.info-box {
+  background-color: var(--bg-light);
+  padding: var(--spacing-md);
+  border: var(--border-thin) solid var(--border-gray);
+  margin-top: var(--spacing-md);
+}
+
+.info-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--spacing-sm) 0;
+}
+
+.info-list li {
+  margin: var(--spacing-sm) 0;
+}
+
+.loading-state {
+  text-align: center;
+  padding: var(--spacing-md);
+}
+
+
+
+/* Personal List Table Styles */
+.personal-list-table th:nth-child(1), .personal-list-table td:nth-child(1) { width: 45%; }
+.personal-list-table th:nth-child(2), .personal-list-table td:nth-child(2) { width: 25%; }
+.personal-list-table th:nth-child(3), .personal-list-table td:nth-child(3) { width: 10%; }
+.personal-list-table th:nth-child(4), .personal-list-table td:nth-child(4) { width: 20%; }
+
+.list-info-table th:nth-child(1), .list-info-table td:nth-child(1) { width: 25%; }
+.list-info-table th:nth-child(2), .list-info-table td:nth-child(2) { width: 75%; }
+
+/* -- 12.0 UTILITY CLASSES -- */
+.hidden { display: none; }
+.visually-hidden { 
+  position: absolute; 
+  width: 1px; 
+  height: 1px; 
+  padding: 0; 
+  margin: -1px; 
+  overflow: hidden; 
+  clip: rect(0, 0, 0, 0); 
+  white-space: nowrap; 
+  border: 0; 
+}
+
+/* -- 13.0 ENHANCED SEARCH FUNCTIONALITY -- */
+
+/* Sort controls */
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.sort-controls .form-label {
+  margin-bottom: 0;
+  margin-right: var(--spacing-sm);
+}
+
+.sort-controls .form-select {
+  min-width: 180px;
+  height: 32px;
+  font-size: 11px;
+}
+
+.results-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.results-count {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--subtle-gray);
+  text-transform: uppercase;
+}
+
+/* Search highlighting */
+mark {
+  background-color: rgba(196, 30, 58, 0.2);
+  color: var(--text-black);
+  padding: 1px 2px;
+  font-weight: 600;
+}
+
+/* Enhanced result styling */
+.result-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: var(--border-thin) solid var(--border-gray);
+}
+
+.result-actions .action-btn {
+  height: 28px;
+  font-size: 10px;
+  padding: var(--spacing-sm);
+}
+
+.result-language {
+  font-family: var(--mono);
+  color: var(--subtle-gray);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   SECTION SPACING - Espaçamento Uniforme entre Seções
+   ========================================================================== */
+section {
+  margin-bottom: var(--spacing-xl);
+}
+
+section:last-of-type {
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Casos específicos que precisam de espaçamento diferenciado */
+.page-header {
+  margin-bottom: var(--spacing-lg);
+}
+
+.tools-section {
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+/* ==========================================================================
+   Homepage Specific Styles
+   ========================================================================== */
+.stats-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border);
+  background: var(--background);
+}
+
+.stat-value {
+  font-family: var(--mono);
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--text);
+}
+
+.stat-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--subtle-gray);
+  text-transform: uppercase;
+  margin-top: var(--spacing-xs);
+}
+
+.authors-grid, .orgs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.author-card, .org-card {
+  padding: var(--spacing-md);
+  border: 1px solid var(--border);
+  background: var(--background);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.author-name, .org-name {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.author-org, .org-info {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--subtle-gray);
+}
+
+.author-works, .org-persons {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--subtle-gray);
+  text-transform: uppercase;
+}
+
+.quick-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: var(--spacing-md);
+}
+
+.stat-info {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--subtle-gray);
+  margin-left: var(--spacing-md);
+  text-transform: uppercase;
+}
+
+/* DOI link styling */
+.result-doi a {
+  color: var(--primary-blue);
+  text-decoration: none;
+}
+
+.result-doi a:hover {
+  text-decoration: underline;
+}
+
+/* Similar works styling */
+.similar-works {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.similar-work {
+  padding: var(--spacing-md);
+  border: 1px solid var(--border);
+  background: var(--background);
+}
+
+.similar-authors {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--subtle-gray);
+  margin: var(--spacing-xs) 0 0 0;
+}
+
+/* Search page styling */
+.quick-search-container {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.quick-search-container .form-input {
+  flex: 1;
+}
+
+.search-filters {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.filter-label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  flex: 1;
+  min-width: 120px;
+}
+
+.search-tips {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--subtle-gray);
+  line-height: 1.6;
+}
+
+.search-tips p {
+  margin: var(--spacing-xs) 0;
+}
+
+.search-tips strong {
+  color: var(--text);
+}
+
+/* ==========================================================================
+   AUTOCOMPLETE STYLES
+   ========================================================================== */
+
+.search-input-container {
+  position: relative;
+  width: 100%;
+}
+
+.autocomplete-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--document-white);
+  border: var(--border-thin) solid var(--border-gray);
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  max-height: 320px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+}
+
+.autocomplete-suggestions.active {
+  display: block;
+}
+
+.autocomplete-suggestion {
+  padding: var(--spacing-md);
+  cursor: pointer;
+  border-bottom: var(--border-thin) solid var(--bg-light);
+  transition: background-color 0.15s ease;
+}
+
+.autocomplete-suggestion:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-suggestion:hover,
+.autocomplete-suggestion.highlighted {
+  background: var(--bg-light);
+}
+
+.suggestion-text {
+  font-size: 14px;
+  color: var(--data-gray);
+  font-weight: 500;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.suggestion-meta {
+  font-size: 12px;
+  color: var(--subtle-gray);
+  font-family: var(--mono);
+}
+
+.suggestion-type {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-right: var(--spacing-sm);
+}
+
+.suggestion-type-title {
+  background: #E3F2FD;
+  color: #1565C0;
+}
+
+.suggestion-type-venue {
+  background: #FFF3E0;
+  color: #E65100;
+}
+
+.suggestion-type-author {
+  background: #F3E5F5;
+  color: #7B1FA2;
+}
+
+.performance-indicator {
+  font-size: 11px;
+  color: var(--subtle-gray);
+  font-family: var(--mono);
+  margin-left: auto;
+}
+
+.relevance-score {
+  display: inline-block;
+  background: var(--bg-light);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  color: var(--subtle-gray);
+  font-family: var(--mono);
+  margin-left: var(--spacing-sm);
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-family: var(--mono);
+}
+
+.badge.peer-reviewed {
+  background: #E8F5E8;
+  color: #2E7D2E;
+}
+
+/* Inline autocomplete styles */
+.search-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.form-input-ghost {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  padding: inherit;
+  margin: 0;
+  color: var(--subtle-gray);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.form-input {
+  position: relative;
+  z-index: 2;
+  background: transparent;
+}
+
+.form-input:focus {
+  background: var(--document-white);
+}
+
+/* Tools buttons section spacing */
+.tools-buttons .action-btn {
+  margin: var(--spacing-sm) var(--spacing-xs) var(--spacing-sm) 0;
+}
+
+/* Hide autocomplete by default */
+.autocomplete-suggestions {
+  display: none;
+}
+
+.autocomplete-suggestions.active {
+  display: block;
+}
+
+/* Hide reading list counter by default */
+.list-counter {
+  display: none;
+}
+
+.list-counter.active {
+  display: inline-block;
+}
+
+/* MD5 code display */
+.md5-code {
+  font-family: var(--mono);
+  font-size: 0.9em;
+  background: var(--bg-light);
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+/* Utility classes */
+.hidden {
+  display: none;
+}
+
+/* Unified pagination styling */
+.pagination, .pagination-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: var(--spacing-lg) 0;
+  padding: var(--spacing-md) 0;
+  border-top: var(--border-thin) solid var(--border-gray);
+}
+
+.pagination-info {
+  flex: 1;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--subtle-gray);
+  text-transform: uppercase;
+}
+
+.pagination .action-link,
+.pagination .action-btn,
+.pagination-nav .action-btn,
+.pagination-nav .pagination-btn {
+  min-width: 80px;
+  text-align: center;
+}
+
+.pagination .action-link:first-child,
+.pagination .action-btn:first-child,
+.pagination-nav .action-btn:first-child {
+  justify-self: flex-start;
+}
+
+.pagination .action-link:last-child,
+.pagination .action-btn:last-child,
+.pagination-nav .action-btn:last-child {
+  justify-self: flex-end;
+}
+
+/* Disabled pagination buttons */
+.pagination-btn[disabled],
+.pagination-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+

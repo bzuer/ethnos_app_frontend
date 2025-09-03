@@ -1,0 +1,99 @@
+# Arquivos de configuração sensível
+.env
+.env.local
+.env.*.local
+
+# Cache Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environment
+venv/
+.venv/
+env/
+.env/
+
+# Flask instance folder
+instance/
+
+# Logs e cache
+*.log
+*.cache
+*.pid
+*.sock
+
+# Node modules e build
+node_modules/
+*.min.js.map
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE e editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backups e arquivos temporários
+*.backup
+*~
+.tmp/
+*.tmp
+*.temp
+
+# Documentation and project files
+/scripts/
+!README.md
+!CLAUDE.md.example
+!/docs/
+
+# Arquivos temporários e logs locais
+*.pid
+*.sock
+*.tmp
+*.temp
+.tmp/
+
+# Arquivos específicos do projeto
+.env
+.env.example
+
+# Cache e arquivos compilados locais
+__pycache__/
+*.pyc
+
+# Coverage e testes
+.coverage
+.pytest_cache/
+.tox/
+coverage.xml
+*.cover
+.hypothesis/
