@@ -1,0 +1,32 @@
+{
+  "name": "site_v2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run build-css && npm run build-js",
+    "build-css": "postcss static/css/styles.dev.css --use autoprefixer --use cssnano --output static/css/styles.min.css",
+    "build-js": "npm run build-js-search && npm run build-js-item && npm run build-js-journal && npm run build-js-api && npm run build-js-app && npm run build-js-journals && npm run build-js-mylist",
+    "build-js-search": "terser static/js/search.dev.js -o static/js/search.min.js --compress --mangle --source-map",
+    "build-js-item": "terser static/js/item-detail.dev.js -o static/js/item-detail.min.js --compress --mangle --source-map",
+    "build-js-journal": "terser static/js/journal-detail.dev.js -o static/js/journal-detail.min.js --compress --mangle --source-map",
+    "build-js-api": "terser static/js/api-client.dev.js -o static/js/api-client.min.js --compress --mangle --source-map",
+    "build-js-app": "terser static/js/app.dev.js -o static/js/app.min.js --compress --mangle --source-map",
+    "build-js-journals": "terser static/js/journals.dev.js -o static/js/journals.min.js --compress --mangle --source-map",
+    "build-js-mylist": "terser static/js/my-list.dev.js -o static/js/my-list.min.js --compress --mangle --source-map",
+    "watch": "npm run build && echo 'Build completed. Files are ready for production.'",
+    "build:dev": "scripts/build.sh"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "clean-css-cli": "^5.6.3",
+    "cssnano": "^7.1.1",
+    "postcss-cli": "^11.0.1",
+    "terser": "^5.43.1",
+    "uglify-js": "^3.19.3"
+  }
+}
