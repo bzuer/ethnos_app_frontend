@@ -161,8 +161,8 @@ def _generate_homepage_data():
             for work in works_response['data']:
                 if work.get('title') and work.get('title').strip() and len(recent_works) < 8:
                     author_names = []
-                    if work.get('authors') and isinstance(work.get('authors'), list) and len(work['authors']) > 0:
-                        for author in work['authors'][:2]:
+                    if work.get('authors_preview') and isinstance(work.get('authors_preview'), list) and len(work['authors_preview']) > 0:
+                        for author in work['authors_preview'][:2]:
                             if isinstance(author, str):
                                 author_name = author.strip()
                                 if author_name:
@@ -170,12 +170,12 @@ def _generate_homepage_data():
                     
                     if author_names:
                         work['formatted_authors'] = ', '.join(author_names)
-                        if len(work['authors']) > 2:
+                        if work.get('author_count', 0) > 2:
                             work['formatted_authors'] += ' et al.'
                     else:
                         work['formatted_authors'] = 'Autor não informado'
                     
-                    work['publication_year'] = work.get('year') or "S/D"
+                    work['publication_year'] = work.get('publication_year') or "S/D"
                     
                     recent_works.append(work)
         
@@ -1065,6 +1065,7 @@ def instructors_detail(instructor_id):
                              teaching_collaborators=[])
 
 
+
 @app.route('/search/results')
 def search_results():
     """Display search results - main route"""
@@ -1112,13 +1113,16 @@ def search_results():
             if peer_reviewed:
                 search_params['peer_reviewed'] = peer_reviewed.lower() == 'true'
             
-            search_results = api_request('/search/advanced', search_params, use_cache=True)
+            search_results = api_request('/search/works', search_params, use_cache=True)
         else:
             search_params = {'q': search_query, 'page': page, 'limit': limit}
             
-            if len(search_query.split()) <= 4 and len(search_query) > 5:
-                search_results = api_request('/search/sphinx', search_params, use_cache=True)
-            else:
+            # Try Sphinx first, fallback to /search/works on error
+            search_results = api_request('/search/sphinx', search_params, use_cache=True)
+            
+            # If Sphinx fails or returns error, use /search/works as fallback
+            if not search_results or search_results.get('status') == 'error' or not search_results.get('data'):
+                app.logger.warning(f"Sphinx search failed for query: {search_query}, falling back to /search/works")
                 search_results = api_request('/search/works', search_params, use_cache=True)
     
     if search_results:
@@ -1359,6 +1363,27 @@ def signatures_works(signature_id):
     
     except Exception as e:
         app.logger.error(f"Error in signatures_works: {e}")
+        person_response = api_request(f'/persons/{signature_id}/works')
+        if person_response and 'data' in person_response:
+            works = person_response['data']
+            for work in works:
+                if 'authors' in work and isinstance(work['authors'], dict):
+                    author_string = work['authors'].get('author_string', '')
+                    if author_string:
+                        author_names = [name.strip() for name in author_string.split(';') if name.strip()]
+                        work['authors'] = [{'name': name} for name in author_names]
+                    else:
+                        work['authors'] = []
+                elif not work.get('authors'):
+                    work['authors'] = []
+            
+            return render_template('pages/search-results.html',
+                                 results=works,
+                                 query=f"Obras de Signature {signature_id}",
+                                 search_params={'query': f"Signature {signature_id}"},
+                                 total=len(works),
+                                 page=1)
+        
         return render_template('errors/500.html'), 500
 
 @app.route('/lists')
@@ -1557,6 +1582,11 @@ def search_page_legacy():
 @app.route('/ppgas/professor/<professor_id>')
 def ppgas_professor_detail_legacy(professor_id):
     return redirect(url_for('instructors_detail', instructor_id=professor_id))
+
+@app.route('/license')
+def license_page():
+    """Página da licença MIT do projeto"""
+    return render_template('pages/license.html')
 
 @app.errorhandler(404)
 def not_found(error):

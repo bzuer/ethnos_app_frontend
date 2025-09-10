@@ -150,7 +150,11 @@ body::before {
 .main-navigation { margin-top: var(--spacing-sm); }
 .page-header { margin-bottom: var(--spacing-lg); }
 .breadcrumb-separator { margin: 0 var(--spacing-sm); }
-.footer { text-align: center; padding-top: var(--spacing-md); border-top: var(--border-thin) solid var(--border-gray); margin-top: var(--spacing-xl); }
+.footer { text-align: justify; padding-top: var(--spacing-md); border-top: var(--border-thin) solid var(--border-gray); margin-top: var(--spacing-xl); line-height: 1.6; }
+.footer-sources { font-size: 11px; line-height: 1.6; }
+.footer-sources strong { color: var(--text-black); }
+.footer-sources a { color: var(--primary-blue); text-decoration: none; }
+.footer-sources a:hover { text-decoration: underline; }
 
 /* -- 4.2 Tabelas -- */
 .data-table { 
@@ -842,6 +846,7 @@ section:last-of-type {
   flex-direction: column;
   gap: var(--spacing-xs);
 }
+
 
 .author-name, .org-name {
   font-weight: bold;

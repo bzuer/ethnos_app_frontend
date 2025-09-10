@@ -135,6 +135,15 @@
             {% endif %}
             
             {% if work.doi_url %}
+            {% set has_md5 = false %}
+            {% if files_data %}
+                {% for file in files_data %}
+                    {% if file.identifiers and file.identifiers.md5 %}
+                        {% set has_md5 = true %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            {% if not has_md5 %}
             <tr>
                 <th>DOI</th>
                 <td class="field-value">
@@ -143,6 +152,7 @@
                     </a>
                 </td>
             </tr>
+            {% endif %}
             {% endif %}
             
             {% if work.language %}
@@ -273,7 +283,17 @@
     <h2 class="title-section" id="tools-title">Ferramentas</h2>
     <div class="action-links tools-buttons">
         {% if work.doi_url %}
+        {% set has_md5 = false %}
+        {% if files_data %}
+            {% for file in files_data %}
+                {% if file.identifiers and file.identifiers.md5 %}
+                    {% set has_md5 = true %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        {% if not has_md5 %}
         <a href="{{ work.doi_url }}" target="_blank" class="action-btn btn-positive">Acessar via DOI</a>
+        {% endif %}
         {% endif %}
         {% if files_data %}
         {% for file in files_data %}
