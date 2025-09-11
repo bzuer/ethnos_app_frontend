@@ -18,8 +18,6 @@ def block_dev_files():
 
 _cache = {}
 _cache_ttl = {}
-CACHE_DURATION = 300
-HOMEPAGE_CACHE_DURATION = 600
 
 def get_cached_data(key):
     if key in _cache and key in _cache_ttl:
@@ -31,11 +29,11 @@ def get_cached_data(key):
     return None
 
 def set_cached_data(key, data, duration=None):
-    cache_duration = duration or CACHE_DURATION
+    cache_duration = duration or app.config['CACHE_DURATION']
     _cache[key] = data
     _cache_ttl[key] = time.time() + cache_duration
 
-def api_request(endpoint, params=None, retry_count=2, use_cache=False, timeout=None):
+def api_request(endpoint, params=None, retry_count=None, use_cache=False, timeout=None):
     """Make a request to the Ethnos API with comprehensive error handling"""
     if use_cache:
         cache_key = f"{endpoint}:{json.dumps(params, sort_keys=True) if params else 'None'}"
@@ -45,7 +43,8 @@ def api_request(endpoint, params=None, retry_count=2, use_cache=False, timeout=N
             return cached_result
     
     url = f"{app.config['API_BASE_URL']}{endpoint}"
-    request_timeout = timeout or 15
+    request_timeout = timeout or app.config['API_TIMEOUT']
+    retry_count = retry_count or app.config['API_RETRY_COUNT']
     
     for attempt in range(retry_count + 1):
         try:
@@ -112,6 +111,36 @@ def api_request(endpoint, params=None, retry_count=2, use_cache=False, timeout=N
             return None
     
     return None
+
+def build_pagination_info(pagination_response, page, limit):
+    """Build standardized pagination info from API response"""
+    if not pagination_response:
+        return None
+        
+    total_results = pagination_response.get('total', 0)
+    total_pages = pagination_response.get('totalPages', max(1, (total_results + limit - 1) // limit))
+    
+    return {
+        'page': page,
+        'totalPages': total_pages,
+        'hasPrev': pagination_response.get('hasPrev', page > 1),
+        'hasNext': pagination_response.get('hasNext', page < total_pages),
+        'total': total_results
+    } if total_pages > 1 else None
+
+def process_author_data(works):
+    """Process and normalize author data in works list"""
+    for work in works:
+        if 'authors' in work and isinstance(work['authors'], dict):
+            author_string = work['authors'].get('author_string', '')
+            if author_string:
+                author_names = [name.strip() for name in author_string.split(';') if name.strip()]
+                work['authors'] = [{'name': name} for name in author_names]
+            else:
+                work['authors'] = []
+        elif not work.get('authors'):
+            work['authors'] = []
+    return works
 
 def filter_quality_results(results):
     """Filter results to show only high-quality records with complete data"""
@@ -267,7 +296,7 @@ def _generate_homepage_data():
         'top_venues': top_venues,
         'top_organizations': top_organizations
     }
-    set_cached_data(homepage_cache_key, homepage_data, HOMEPAGE_CACHE_DURATION)
+    set_cached_data(homepage_cache_key, homepage_data, app.config['HOMEPAGE_CACHE_DURATION'])
     
     return homepage_data
 
@@ -446,7 +475,7 @@ def person_id_works(person_id):
         author_name = person_data.get('preferred_name') or person_data.get('name', 'Autor')
         
         page = int(request.args.get('page', 1))
-        limit = 25
+        limit = app.config['DEFAULT_LIMIT']
         
         works_response = api_request(f'/persons/{person_id}/works', {'page': page, 'limit': limit})
         
@@ -461,28 +490,9 @@ def person_id_works(person_id):
         
         results = works_response.get('data', [])
         
-        for work in results:
-            if 'authors' in work and isinstance(work['authors'], dict):
-                author_string = work['authors'].get('author_string', '')
-                if author_string:
-                    author_names = [name.strip() for name in author_string.split(';') if name.strip()]
-                    work['authors'] = [{'name': name} for name in author_names]
-                else:
-                    work['authors'] = []
-            elif not work.get('authors'):
-                work['authors'] = []
-        
-        pagination_info = works_response.get('pagination', {})
-        total_results = pagination_info.get('total', len(results))
-        total_pages = pagination_info.get('totalPages', 1)
-        
-        pagination = {
-            'page': page,
-            'totalPages': total_pages,
-            'hasPrev': pagination_info.get('hasPrev', page > 1),
-            'hasNext': pagination_info.get('hasNext', page < total_pages),
-            'total': total_results
-        } if total_pages > 1 else None
+        results = process_author_data(results)
+        pagination = build_pagination_info(works_response.get('pagination', {}), page, limit)
+        total_results = works_response.get('pagination', {}).get('total', len(results))
         
         search_params = {'query': f"Obras de {author_name}"}
         
@@ -568,7 +578,7 @@ def organizations_detail(org_id):
             return render_template('errors/404.html'), 404
         
         page = int(request.args.get('page', 1))
-        limit = 25
+        limit = app.config['DEFAULT_LIMIT']
         
         works_response = api_request(f'/organizations/{org_id}/works', {'page': page, 'limit': limit})
         
@@ -632,7 +642,7 @@ def venues_complete():
     """Display complete journals listing with signature works layout and pagination"""
     try:
         page = int(request.args.get('page', 1))
-        limit = 25
+        limit = app.config['DEFAULT_LIMIT']
         
         venues_response = api_request('/venues', {'page': page, 'limit': limit})
         
@@ -689,7 +699,7 @@ def organizations_complete():
     """Display complete organizations listing with signature works layout and pagination"""
     try:
         page = int(request.args.get('page', 1))
-        limit = 25
+        limit = app.config['DEFAULT_LIMIT']
         
         orgs_response = api_request('/organizations', {'page': page, 'limit': limit})
         
@@ -750,16 +760,19 @@ def works_list():
     """Display complete works catalog using /works endpoint"""
     try:
         page = int(request.args.get('page', 1))
-        limit = 25
+        limit = app.config['DEFAULT_LIMIT']
         
-        works_response = api_request('/works', {'page': page, 'limit': limit})
+        works_response = api_request('/works', {'page': page, 'limit': limit}, use_cache=True)
         
         if not works_response or 'data' not in works_response:
             return render_template('pages/search-results.html',
                                  results=[],
                                  query="Todo o Catálogo",
                                  total=0,
-                                 is_catalog_listing=True)
+                                 page=page,
+                                 pagination={'total': 0, 'page': page, 'totalPages': 0},
+                                 is_catalog_listing=True,
+                                 search_params={'query': 'Todo o Catálogo'})
         
         works_list = works_response['data']
         
@@ -806,7 +819,7 @@ def works_list():
                              page=page,
                              pagination=pagination,
                              is_catalog_listing=True,
-                             search_params={'query': '*'})
+                             search_params={'query': 'Todo o Catálogo'})
     
     except Exception as e:
         app.logger.error(f"Error in catalog: {e}")
@@ -1002,8 +1015,9 @@ def instructors_list():
     try:
         page = int(request.args.get('page', 1))
         limit = int(request.args.get('limit', 20))
+        offset = (page - 1) * limit
         
-        instructors_data = api_request('/instructors', {'page': page, 'limit': limit})
+        instructors_data = api_request('/instructors', {'offset': offset, 'limit': limit})
         instructors = instructors_data.get('instructors', []) if instructors_data else []
         pagination = instructors_data.get('pagination', {}) if instructors_data else {}
         
@@ -1014,6 +1028,7 @@ def instructors_list():
                              pagination=pagination,
                              stats=stats)
     except Exception as e:
+        app.logger.error(f"Error in instructors_list: {e}")
         return render_template('pages/instructors-list.html',
                              instructors=[],
                              pagination={},

@@ -37,39 +37,6 @@ Consultar este arquivo no início e atualizá-lo ao final de cada tarefa.
 - Uso exclusivo para continuidade técnica
 - Jamais quebrar a estrutura organizacional estabelecida
 
-### Filosofia do Projeto
-- **Simplicidade**: Mantenha o projeto limpo, direto e funcional
-- **Limpeza**: Organize código, remove redundâncias, estruture logicamente
-- **Funcionalidade**: Priorize performance, usabilidade e acessibilidade
-- **Consistência**: Siga padrões estabelecidos no design e código
-
-### Exigências Técnicas
-- **CSS**: Antes de adicionar novas categorias, verifique existência de categorias anteriores
-- **Design**: Consulte sempre docs/DESIGN_GUIDE.md para manter consistência visual
-- **Templates**: Mantenha estrutura semântica e ARIA para acessibilidade
-- **JavaScript**: Use arquivos .dev para desenvolvimento, .min para produção
-- **Build**: Execute build profissional antes de qualquer deploy (npm run build)
-
-### Estrutura Obrigatória
-- **Documentação**: Em docs/ (não criar .md na raiz sem solicitação explícita)
-- **Scripts**: Em scripts/ (build.sh, deploy, etc.)
-- **Backups**: Em backup/ (manter separado do código principal)
-- **Assets**: static/ com separação dev/min clara
-
-### Workflow de Desenvolvimento
-1. **Leia documentação**: Consulte docs/DESIGN_GUIDE.md e docs/CLAUDE.md
-2. **Desenvolva**: Edite arquivos .dev (CSS/JS)
-3. **Build**: Execute npm run build ou scripts/build.sh
-4. **Teste**: Verifique funcionamento e performance
-5. **Documente**: Atualize CLAUDE.md ao final
-
-### Regras Rígidas
-- Criar arquivos .md apenas quando explicitamente solicitado
-- Manter organização e limpeza absoluta no projeto
-- Remover completamente funcionalidades substituídas (protocolo de substituição)
-- Atualizar este arquivo no início e ao final de cada sessão
-- Uso exclusivo para continuidade técnica
-- Jamais quebrar a estrutura organizacional estabelecida
 
 ### Protocolo de Substituição de Funcionalidades
 1. Documentar funcionalidade removida em "Funcionalidades Removidas"

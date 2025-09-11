@@ -28,16 +28,19 @@
   </div>
   {% endfor %}
 
-  {% if pagination %}
+  {% if pagination and pagination.total > pagination.limit %}
   <div class="pagination">
-    {% if pagination.has_prev %}
-    <a href="{{ url_for('instructors_list', page=pagination.page-1) }}" class="pagination-link">← Anterior</a>
+    {% set current_page = (pagination.offset // pagination.limit) + 1 %}
+    {% set total_pages = ((pagination.total - 1) // pagination.limit) + 1 %}
+    
+    {% if pagination.offset > 0 %}
+    <a href="{{ url_for('instructors_list', page=current_page-1) }}" class="pagination-link">← Anterior</a>
     {% endif %}
     
-    <span class="pagination-info">Página {{ pagination.page }} de {{ pagination.totalPages }}</span>
+    <span class="pagination-info">Página {{ current_page }} de {{ total_pages }}</span>
     
     {% if pagination.has_next %}
-    <a href="{{ url_for('instructors_list', page=pagination.page+1) }}" class="pagination-link">Próxima →</a>
+    <a href="{{ url_for('instructors_list', page=current_page+1) }}" class="pagination-link">Próxima →</a>
     {% endif %}
   </div>
   {% endif %}

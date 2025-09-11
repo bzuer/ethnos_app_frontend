@@ -5,9 +5,9 @@
     <span class="breadcrumb-separator" aria-hidden="true">/</span>
     <a class="nav-breadcrumb" href="{{ url_for('search_form') }}" {% if request.endpoint in ['search_form', 'search_advanced'] %}aria-current="page"{% endif %}>BUSCA AVANÇADA</a>
     <span class="breadcrumb-separator" aria-hidden="true">/</span>
-    <a class="nav-breadcrumb" href="{{ url_for('ppgas_home') }}" {% if request.endpoint.startswith('ppgas') %}aria-current="page"{% endif %}>PPGAS</a>
+    <a class="nav-breadcrumb" href="{{ url_for('ppgas_home') }}" {% if request.endpoint and request.endpoint.startswith('ppgas') %}aria-current="page"{% endif %}>PPGAS</a>
     <span class="breadcrumb-separator" aria-hidden="true">/</span>
-    <a class="nav-breadcrumb" href="{{ url_for('venues_list') }}" {% if request.endpoint.startswith('venues') %}aria-current="page"{% endif %}>PERIÓDICOS</a>
+    <a class="nav-breadcrumb" href="{{ url_for('venues_list') }}" {% if request.endpoint and request.endpoint.startswith('venues') %}aria-current="page"{% endif %}>PERIÓDICOS</a>
     <span class="breadcrumb-separator" aria-hidden="true">/</span>
     <a class="nav-breadcrumb" href="{{ url_for('lists') }}" {% if request.endpoint == 'lists' %}aria-current="page"{% endif %} aria-describedby="reading-list-counter">
       MINHA LISTA

@@ -321,39 +321,59 @@ async function exportABNT() {
         return;
     }
     
-    showTemporaryMessage('Buscando dados completos...', 'info');
+    showTemporaryMessage('Gerando documento DOCX...', 'info');
     
     const completeData = await fetchCompleteWorkData(items.map(item => item.id));
     
-    // Cabeçalho formatado
-    let content = '';
-    content += '═══════════════════════════════════════════════════════════════\\n';
-    content += '                 REFERÊNCIAS BIBLIOGRÁFICAS                    \\n';
-    content += '                    FORMATO ABNT - NBR 6023                     \\n';
-    content += '═══════════════════════════════════════════════════════════════\\n\\n';
+    // Usando dynamic import para carregar as bibliotecas
+    const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = await import('https://unpkg.com/docx@8.2.2/build/index.js');
     
-    content += `📋 INFORMAÇÕES DA EXPORTAÇÃO:\\n`;
-    content += `   • Data: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}\\n`;
-    content += `   • Total de referências: ${items.length}\\n`;
-    content += `   • Dados completos obtidos: ${completeData.length}\\n`;
-    content += `   • Fonte: Ethnos Academic Database\\n\\n`;
+    const children = [];
     
-    content += '───────────────────────────────────────────────────────────────\\n';
-    content += '                        REFERÊNCIAS\\n';
-    content += '───────────────────────────────────────────────────────────────\\n\\n';
+    // Informações da exportação
+    children.push(
+        new Paragraph({
+            children: [
+                new TextRun({
+                    text: "INFORMAÇÕES DA EXPORTAÇÃO",
+                    bold: true
+                })
+            ]
+        }),
+        new Paragraph({
+            text: `Data: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}`
+        }),
+        new Paragraph({
+            text: `Total de referências: ${items.length}`
+        }),
+        new Paragraph({
+            text: `Dados completos obtidos: ${completeData.length}`
+        }),
+        new Paragraph({
+            text: "Fonte: Ethnos Academic Database"
+        }),
+        new Paragraph({ text: "" }), // Linha em branco
+        
+        new Paragraph({
+            children: [
+                new TextRun({
+                    text: "REFERÊNCIAS",
+                    bold: true
+                })
+            ]
+        }),
+        new Paragraph({ text: "" })
+    );
     
+    // Referências
     items.forEach((item, index) => {
         const work = completeData.find(data => data.id === item.id) || item;
         
-        // Número da referência
-        content += `[${String(index + 1).padStart(2, '0')}] `;
-        
         let authorsText = 'AUTOR NÃO INFORMADO';
         if (work.authors && Array.isArray(work.authors)) {
-            authorsText = work.authors.map((author, idx) => {
+            authorsText = work.authors.map((author) => {
                 let authorName = author.name || author.full_name || author;
                 
-                // Formato ABNT: SOBRENOME, Nome
                 if (authorName && authorName.includes(' ')) {
                     const parts = authorName.trim().split(' ');
                     const lastName = parts.pop().toUpperCase();
@@ -384,60 +404,37 @@ async function exportABNT() {
         const openAccess = work.publication?.open_access || work.open_access;
         const peerReviewed = work.publication?.peer_reviewed || work.peer_reviewed;
         
-        // Formato ABNT estruturado
-        content += `${authorsText}. `;
-        content += `${title}${subtitle}. `;
+        // Construir referência ABNT
+        let referenceText = `${authorsText}. ${title}${subtitle}. `;
         
         if (venue) {
-            content += `**${venue}**, `;
-            if (volume) content += `v. ${volume}, `;
-            if (issue && issue !== 'None') content += `n. ${issue}, `;
+            referenceText += `${venue}, `;
+            if (volume) referenceText += `v. ${volume}, `;
+            if (issue && issue !== 'None') referenceText += `n. ${issue}, `;
         }
-        if (publisher && venue) content += `${publisher}, `;
-        else if (publisher) content += `${publisher}, `;
+        if (publisher && venue) referenceText += `${publisher}, `;
+        else if (publisher) referenceText += `${publisher}, `;
         
-        content += `${year}.`;
+        referenceText += `${year}.`;
         
-        if (pages) content += ` p. ${pages}.`;
+        if (pages) referenceText += ` p. ${pages}.`;
         if (doi) {
-            content += ` Disponível em: https://doi.org/${doi}.`;
-            content += ` Acesso em: ${new Date().toLocaleDateString('pt-BR')}.`;
-        }
-        content += '\\n';
-        
-        // Informações complementares organizadas
-        const metadata = [];
-        if (workType) metadata.push(`Tipo: ${formatWorkType(workType)}`);
-        if (language && language !== 'pt') metadata.push(`Idioma: ${formatLanguage(language)}`);
-        if (issn) metadata.push(`ISSN: ${issn}`);
-        if (peerReviewed) metadata.push('🔍 Revisado por pares');
-        if (openAccess) metadata.push('🔓 Acesso aberto');
-        
-        if (metadata.length > 0) {
-            content += `     ╰─ ${metadata.join(' • ')}\\n`;
+            referenceText += ` Disponível em: https://doi.org/${doi}. Acesso em: ${new Date().toLocaleDateString('pt-BR')}.`;
         }
         
-        // Abstract formatado
-        if (work.abstract && work.abstract.length > 0) {
-            const abstractText = work.abstract.length > 200 
-                ? work.abstract.substring(0, 200) + '...' 
-                : work.abstract;
-            content += `     📝 Resumo: ${abstractText}\\n`;
-        }
-        
-        content += '\\n';
-        
-        // Separador entre referências
-        if (index < items.length - 1) {
-            content += '     ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈\\n\\n';
-        }
+        // Adicionar referência como parágrafo justificado (não recuado)
+        children.push(
+            new Paragraph({
+                text: referenceText,
+                alignment: AlignmentType.JUSTIFY,
+                spacing: {
+                    after: 240  // Espaçamento após cada referência
+                }
+            })
+        );
     });
     
-    // Rodapé
-    content += '\\n───────────────────────────────────────────────────────────────\\n';
-    content += '                         ESTATÍSTICAS\\n';
-    content += '───────────────────────────────────────────────────────────────\\n\\n';
-    
+    // Estatísticas
     const stats = {
         total: items.length,
         withAbstract: completeData.filter(w => w.abstract && w.abstract.length > 0).length,
@@ -446,18 +443,57 @@ async function exportABNT() {
         peerReviewed: completeData.filter(w => w.publication?.peer_reviewed || w.peer_reviewed).length
     };
     
-    content += `📊 Total de referências: ${stats.total}\\n`;
-    content += `📄 Com resumo: ${stats.withAbstract} (${Math.round(stats.withAbstract/stats.total*100)}%)\\n`;
-    content += `🔗 Com DOI: ${stats.withDOI} (${Math.round(stats.withDOI/stats.total*100)}%)\\n`;
-    content += `🔓 Acesso aberto: ${stats.openAccess} (${Math.round(stats.openAccess/stats.total*100)}%)\\n`;
-    content += `🔍 Revisado por pares: ${stats.peerReviewed} (${Math.round(stats.peerReviewed/stats.total*100)}%)\\n\\n`;
+    children.push(
+        new Paragraph({
+            children: [
+                new TextRun({
+                    text: "ESTATÍSTICAS",
+                    bold: true
+                })
+            ]
+        }),
+        new Paragraph({
+            text: `Total de referências: ${stats.total}`
+        }),
+        new Paragraph({
+            text: `Com resumo: ${stats.withAbstract} (${Math.round(stats.withAbstract/stats.total*100)}%)`
+        }),
+        new Paragraph({
+            text: `Com DOI: ${stats.withDOI} (${Math.round(stats.withDOI/stats.total*100)}%)`
+        }),
+        new Paragraph({
+            text: `Acesso aberto: ${stats.openAccess} (${Math.round(stats.openAccess/stats.total*100)}%)`
+        }),
+        new Paragraph({
+            text: `Revisado por pares: ${stats.peerReviewed} (${Math.round(stats.peerReviewed/stats.total*100)}%)`
+        }),
+        new Paragraph({ text: "" }),
+        new Paragraph({
+            text: "Gerado por Ethnos Academic Database - ethnos.app",
+            alignment: AlignmentType.CENTER,
+            italic: true
+        })
+    );
     
-    content += '═══════════════════════════════════════════════════════════════\\n';
-    content += '     Gerado por Ethnos Academic Database • ethnos.app\\n';
-    content += '═══════════════════════════════════════════════════════════════';
+    const doc = new Document({
+        sections: [{
+            children: children
+        }]
+    });
     
-    downloadFile(content, `referencias-abnt-${new Date().toISOString().split('T')[0]}.txt`, 'text/plain');
-    showTemporaryMessage('Referências ABNT exportadas com formatação profissional', 'success');
+    // Gerar e baixar o documento
+    const blob = await Packer.toBlob(doc);
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    
+    link.href = url;
+    link.download = `referencias-abnt-${new Date().toISOString().split('T')[0]}.docx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    showTemporaryMessage('Referências ABNT exportadas em formato DOCX', 'success');
 }
 
 function formatWorkType(type) {
@@ -499,18 +535,18 @@ async function exportBibTeX() {
     
     // Cabeçalho BibTeX formatado
     let content = '';
-    content += '%════════════════════════════════════════════════════════════════\\n';
-    content += '%                    BIBLIOGRAFIA BIBTEX                        \\n';
-    content += '%                   Ethnos Academic Database                    \\n';  
-    content += '%════════════════════════════════════════════════════════════════\\n';
-    content += '%\\n';
-    content += `% Exportado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}\\n`;
-    content += `% Total de referências: ${items.length}\\n`;
-    content += `% Dados completos obtidos: ${completeData.length}\\n`;
-    content += `% Formato: BibTeX padrão para LaTeX\\n`;
-    content += `% Fonte: ethnos.app\\n`;
-    content += '%\\n';
-    content += '%────────────────────────────────────────────────────────────────\\n\\n';
+    content += '%================================================================\n';
+    content += '%                    BIBLIOGRAFIA BIBTEX                        \n';
+    content += '%                   Ethnos Academic Database                    \n';  
+    content += '%================================================================\n';
+    content += '%\n';
+    content += `% Exportado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}\n`;
+    content += `% Total de referências: ${items.length}\n`;
+    content += `% Dados completos obtidos: ${completeData.length}\n`;
+    content += `% Formato: BibTeX padrão para LaTeX\n`;
+    content += `% Fonte: ethnos.app\n`;
+    content += '%\n';
+    content += '%----------------------------------------------------------------\n\n';
     
     items.forEach(item => {
         const work = completeData.find(data => data.id === item.id) || item;
@@ -580,60 +616,60 @@ async function exportBibTeX() {
         }
         
         // Comentário identificador da referência
-        content += `% ──────── Referência ${items.indexOf(item) + 1}/${items.length} ────────\\n`;
-        content += `@${entryType}{${citeKey},\\n`;
+        content += `% -------- Referência ${items.indexOf(item) + 1}/${items.length} --------\n`;
+        content += `@${entryType}{${citeKey},\n`;
         
         // Campos obrigatórios primeiro
-        if (authorsText) content += `  author    = {${authorsText}},\\n`;
-        content += `  title     = {${title}${subtitle}},\\n`;
-        if (year) content += `  year      = {${year}},\\n`;
+        if (authorsText) content += `  author    = {${authorsText}},\n`;
+        content += `  title     = {${title}${subtitle}},\n`;
+        if (year) content += `  year      = {${year}},\n`;
         
         // Campos específicos por tipo (alinhados)
         switch (entryType) {
             case 'article':
-                if (venue) content += `  journal   = {${venue}},\\n`;
-                if (volume) content += `  volume    = {${volume}},\\n`;
-                if (issue && issue !== 'None') content += `  number    = {${issue}},\\n`;
-                if (pages) content += `  pages     = {${pages}},\\n`;
+                if (venue) content += `  journal   = {${venue}},\n`;
+                if (volume) content += `  volume    = {${volume}},\n`;
+                if (issue && issue !== 'None') content += `  number    = {${issue}},\n`;
+                if (pages) content += `  pages     = {${pages}},\n`;
                 break;
                 
             case 'book':
-                if (publisher) content += `  publisher = {${publisher}},\\n`;
-                if (pages) content += `  pages     = {${pages}},\\n`;
+                if (publisher) content += `  publisher = {${publisher}},\n`;
+                if (pages) content += `  pages     = {${pages}},\n`;
                 break;
                 
             case 'incollection':
-                if (venue) content += `  booktitle = {${venue}},\\n`;
-                if (publisher) content += `  publisher = {${publisher}},\\n`;
-                if (pages) content += `  pages     = {${pages}},\\n`;
+                if (venue) content += `  booktitle = {${venue}},\n`;
+                if (publisher) content += `  publisher = {${publisher}},\n`;
+                if (pages) content += `  pages     = {${pages}},\n`;
                 break;
                 
             case 'inproceedings':
-                if (venue) content += `  booktitle = {${venue}},\\n`;
-                if (pages) content += `  pages     = {${pages}},\\n`;
+                if (venue) content += `  booktitle = {${venue}},\n`;
+                if (pages) content += `  pages     = {${pages}},\n`;
                 break;
                 
             case 'phdthesis':
-                if (publisher) content += `  school    = {${publisher}},\\n`;
+                if (publisher) content += `  school    = {${publisher}},\n`;
                 break;
                 
             case 'techreport':
-                if (publisher) content += `  institution = {${publisher}},\\n`;
+                if (publisher) content += `  institution = {${publisher}},\n`;
                 break;
         }
         
         // Campos opcionais (alinhados)
         if (doi) {
-            content += `  doi       = {${doi}},\\n`;
-            content += `  url       = {https://doi.org/${doi}},\\n`;
+            content += `  doi       = {${doi}},\n`;
+            content += `  url       = {https://doi.org/${doi}},\n`;
         }
-        if (issn) content += `  issn      = {${issn}},\\n`;
-        if (language && language !== 'pt') content += `  language  = {${language}},\\n`;
+        if (issn) content += `  issn      = {${issn}},\n`;
+        if (language && language !== 'pt') content += `  language  = {${language}},\n`;
         
         // Abstract (limitado e formatado)
         if (abstract) {
             const cleanAbstract = abstract.replace(/[{}\\\\]/g, '').substring(0, 300);
-            content += `  abstract  = {${cleanAbstract}${abstract.length > 300 ? '...' : ''}},\\n`;
+            content += `  abstract  = {${cleanAbstract}${abstract.length > 300 ? '...' : ''}},\n`;
         }
         
         // Notas especiais
@@ -641,18 +677,18 @@ async function exportBibTeX() {
         if (work.publication?.open_access || work.open_access) notes.push('Open Access');
         if (work.publication?.peer_reviewed || work.peer_reviewed) notes.push('Peer Reviewed');
         if (notes.length > 0) {
-            content += `  note      = {${notes.join(', ')}},\\n`;
+            content += `  note      = {${notes.join(', ')}},\n`;
         }
         
-        content += '}\\n\\n';
+        content += '}\n\n';
     });
     
     // Rodapé informativo
-    content += '%────────────────────────────────────────────────────────────────\\n';
-    content += `% Total de ${items.length} referências exportadas\\n`;
-    content += `% Gerado por Ethnos Academic Database (ethnos.app)\\n`;
-    content += `% Formato compatível com LaTeX, BibDesk, Mendeley, Zotero\\n`;
-    content += '%════════════════════════════════════════════════════════════════';
+    content += '%----------------------------------------------------------------\n';
+    content += `% Total de ${items.length} referências exportadas\n`;
+    content += `% Gerado por Ethnos Academic Database (ethnos.app)\n`;
+    content += `% Formato compatível com LaTeX, BibDesk, Mendeley, Zotero\n`;
+    content += '%================================================================';
     
     downloadFile(content, `bibliografia-${new Date().toISOString().split('T')[0]}.bib`, 'text/plain');
     showTemporaryMessage('Bibliografia BibTeX exportada com formatação profissional', 'success');
@@ -705,78 +741,78 @@ async function exportRIS() {
                 risType = (work.venue?.name || work.venue_name) ? 'JOUR' : 'GEN';
         }
         
-        content += `TY  - ${risType}\\n`;
+        content += `TY  - ${risType}\n`;
         
         if (work.title) {
             const fullTitle = work.title + (work.subtitle ? ` - ${work.subtitle}` : '');
-            content += `TI  - ${fullTitle}\\n`;
+            content += `TI  - ${fullTitle}\n`;
         }
         
         if (Array.isArray(work.authors)) {
             work.authors.forEach(author => {
                 const authorName = author.name || author.full_name || author;
                 if (authorName) {
-                    content += `AU  - ${authorName}\\n`;
+                    content += `AU  - ${authorName}\n`;
                     
                     if (author.affiliation) {
-                        content += `AD  - ${author.affiliation}\\n`;
+                        content += `AD  - ${author.affiliation}\n`;
                     }
                     
                     if (author.orcid) {
-                        content += `UR  - https://orcid.org/${author.orcid}\\n`;
+                        content += `UR  - https://orcid.org/${author.orcid}\n`;
                     }
                 }
             });
         } else if (work.authors) {
-            content += `AU  - ${work.authors}\\n`;
+            content += `AU  - ${work.authors}\n`;
         }
         
         if (work.venue?.name || work.venue_name) {
             const venueName = work.venue?.name || work.venue_name;
             if (risType === 'JOUR') {
-                content += `JO  - ${venueName}\\n`;
+                content += `JO  - ${venueName}\n`;
             } else {
-                content += `T2  - ${venueName}\\n`;  // Secondary title for other types
+                content += `T2  - ${venueName}\n`;  // Secondary title for other types
             }
         }
         
         const year = work.publication?.year || work.year;
-        if (year) content += `PY  - ${year}\\n`;
+        if (year) content += `PY  - ${year}\n`;
         
         const volume = work.publication?.volume || work.volume;
-        if (volume) content += `VL  - ${volume}\\n`;
+        if (volume) content += `VL  - ${volume}\n`;
         
         const issue = work.publication?.issue || work.issue;
-        if (issue && issue !== 'None') content += `IS  - ${issue}\\n`;
+        if (issue && issue !== 'None') content += `IS  - ${issue}\n`;
         
         const pages = work.publication?.pages || work.pages;
         if (pages) {
             // RIS suporta páginas de início e fim separadas ou intervalo
             if (pages.includes('-')) {
                 const [start, end] = pages.split('-');
-                content += `SP  - ${start.trim()}\\n`;
-                if (end && end.trim()) content += `EP  - ${end.trim()}\\n`;
+                content += `SP  - ${start.trim()}\n`;
+                if (end && end.trim()) content += `EP  - ${end.trim()}\n`;
             } else {
-                content += `SP  - ${pages}\\n`;
+                content += `SP  - ${pages}\n`;
             }
         }
         
         const publisher = work.publisher?.name || work.publisher_name;
-        if (publisher) content += `PB  - ${publisher}\\n`;
+        if (publisher) content += `PB  - ${publisher}\n`;
         
         const doi = work.doi;
         if (doi) {
-            content += `DO  - ${doi}\\n`;
-            content += `UR  - https://doi.org/${doi}\\n`;
+            content += `DO  - ${doi}\n`;
+            content += `UR  - https://doi.org/${doi}\n`;
         }
         
         const issn = work.venue?.issn;
-        if (issn) content += `SN  - ${issn}\\n`;
+        if (issn) content += `SN  - ${issn}\n`;
         
         // Abstract - limitar tamanho para compatibilidade
         if (work.abstract) {
-            const cleanAbstract = work.abstract.replace(/[\\r\\n\\t]/g, ' ').substring(0, 1000);
-            content += `AB  - ${cleanAbstract}${work.abstract.length > 1000 ? '...' : ''}\\n`;
+            const cleanAbstract = work.abstract.replace(/[\\r\n\\t]/g, ' ').substring(0, 1000);
+            content += `AB  - ${cleanAbstract}${work.abstract.length > 1000 ? '...' : ''}\n`;
         }
         
         // Language code (ISO 639-1 preferred)
@@ -786,7 +822,7 @@ async function exportRIS() {
                 'de': 'ger', 'it': 'ita', 'Eng': 'eng', 'Ita': 'ita', 'Por': 'por'
             };
             const langCode = langMap[work.language] || work.language.toLowerCase();
-            content += `LA  - ${langCode}\\n`;
+            content += `LA  - ${langCode}\n`;
         }
         
         // Keywords for quality indicators
@@ -801,18 +837,18 @@ async function exportRIS() {
             keywords.push(workType.toLowerCase());
         }
         if (keywords.length > 0) {
-            content += `KW  - ${keywords.join(', ')}\\n`;
+            content += `KW  - ${keywords.join(', ')}\n`;
         }
         
         // Database and provider info
-        content += `DB  - ethnos_app\\n`;
-        content += `DP  - Ethnos Academic Database\\n`;
+        content += `DB  - ethnos_app\n`;
+        content += `DP  - Ethnos Academic Database\n`;
         
         // Access date
-        content += `DA  - ${new Date().toISOString().split('T')[0]}\\n`;
+        content += `DA  - ${new Date().toISOString().split('T')[0]}\n`;
         
         // End record
-        content += 'ER  - \\n\\n';
+        content += 'ER  - \n\n';
     });
     
     downloadFile(content, `referencias-expandido-${new Date().toISOString().split('T')[0]}.ris`, 'application/x-research-info-systems');
